@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Task {
+  id Int @id  @default(autoincrement())
+  title String
+  description String
+  status String @default("OPEN")
+}
+
+model Housing_complex {
+  id Int @id  @default(autoincrement())
+  name String  @unique
+  description String
+  number_of_houses String
+  administrator String 
+  direccion String
+  phone String
+ // owner Owner[]
+  createdAt     DateTime @default(now())
+}
+
+model Owner {
+  id Int @id  @default(autoincrement())
+  fullName String
+  identification String 
+  house Int
+  phone String
+  email String
+ // housing_complex Housing_complex @relation(fields: [housing_complex_id], references: [id])
+  housing_complex_id Int
+  share Aliquot[]
+  createdAt     DateTime @default(now())
+  @@unique([fullName, house])
+}
+
+model Aliquot {
+  id Int @id  @default(autoincrement())
+  description String 
+  month Int
+  year Int 
+  value Float
+  state String 
+  housing_complex_id Int
+  owner Owner @relation(fields: [ownerId], references: [ id ])
+  ownerId Int
+  createdAt DateTime @default(now())
+
+  @@unique([ownerId, housing_complex_id, year, month])
+}
+
+
+model Profile {
+  id Int    @id 
+  user   UserHousing   @relation(fields: [id], references: [id])
+  rol   String @default("USER")
+}
+
+model UserHousing {
+  id      Int      @id   @default(autoincrement())
+  email   String   @unique
+  password  String
+  profile Profile?
+}
